@@ -8,16 +8,16 @@ const dynamodb = new AWS.DynamoDB({'region': process.env.REGION, "apiVersion": "
 module.exports.putStory = (event, context, callback) => {
   const storyIdentifier = event && event.pathParameters && event.pathParameters.storyIdentifier ? event.pathParameters.storyIdentifier : "";
   const body = event && event.body ? JSON.parse(event.body) : {};
-  const revisionIdentifier = JSON.stringify(body.revisionId);
-  const storyType = JSON.stringify(body.type);
-  const creationDate = JSON.stringify(body.creationDate);
-  const modificationDate = JSON.stringify(body.modificationDate);
-  const publicationDate = JSON.stringify(body.publicationDate);
-  const title = JSON.stringify(body.title);
+  const revisionIdentifier = body.revisionId;
+  const storyType = body.type;
+  const creationDate = body.creationDate;
+  const modificationDate = body.modificationDate;
+  const publicationDate = body.publicationDate;
+  const title = body.title;
   const callout = JSON.stringify(body.callout);
   const storyShare = JSON.stringify(body.share);
   const cards = JSON.stringify(body.cards);
-  const bodyHtml = JSON.stringify(body.bodyHtml);
+  const bodyHtml = body.bodyHtml;
   const params = {
    Item: {
     storyIdentifier: {
