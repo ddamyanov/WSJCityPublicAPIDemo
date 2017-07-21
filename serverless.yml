@@ -1,0 +1,144 @@
+service: test-apig
+
+frameworkVersion: ">=1.1.0 <2.0.0"
+plugins:
+  - serverless-mocha-plugin
+  # - serverless-aws-documentation
+
+provider:
+  name: aws
+  runtime: nodejs6.10
+  # http://forum.serverless.com/t/getting-handle-accountid-in-serverless-config/946/8
+  # by default AWS variables like ${saml:sub} use same format as Serverless variables like ${self:custom.prefix}
+  # We use variableSyntax here to change serverless vars to look instead like ${{self:custom.prefix}}
+  variableSyntax: '\${{(((?!\${{).)+?)}}'
+  versionFunctions: false
+  memorySize: 512
+  timeout: 20
+  region: eu-west-2
+  environment:
+    STORIES_DYNAMODB_TABLE: ${{self:service}}-${{opt:stage, self:provider.stage}}-stories
+    TAGS_DYNAMODB_TABLE: ${{self:service}}-${{opt:stage, self:provider.stage}}-tags
+    TAG_IDENTIFIER_DYNAMODB_GSI: ${{self:service}}-${{opt:stage, self:provider.stage}}-tag-identifier
+    REGION: ${{self:provider.region}}
+
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+        - dynamodb:BatchWriteItem
+        - dynamodb:BatchGetItem
+      Resource: ["arn:aws:dynamodb:${{opt:region, self:provider.region}}:*:table/${{self:provider.environment.STORIES_DYNAMODB_TABLE}}", "arn:aws:dynamodb:${{opt:region, self:provider.region}}:*:table/${{self:provider.environment.TAGS_DYNAMODB_TABLE}}", "arn:aws:dynamodb:${{opt:region, self:provider.region}}:*:table/${{self:provider.environment.TAGS_DYNAMODB_TABLE}}/index/*"]
+    - Effect: Allow
+      Action:
+        - xray:PutTraceSegments
+        - xray:PutTelemetryRecords
+      Resource: ["*"]
+    - Effect: Allow
+      Action: 
+        - logs:CreateLogGroup
+        - logs:CreateLogStream
+        - logs:DescribeLogGroups
+        - logs:DescribeLogStreams
+        - logs:PutLogEvents
+        - logs:GetLogEvents
+        - logs:FilterLogEvents
+      Resource: ["*"]
+      
+functions:
+
+  replay:
+    handler: functions/replay.replay
+    events:
+      - http: GET replay
+  stories-get:
+    handler: functions/get-all-stories.getAllTopStories
+    events:
+      - http:
+          path: stories
+          method: get
+          cors: true
+  stories-put:
+    handler: functions/get-all-stories.putAllTopStories
+    events:
+      - http:
+          path: stories
+          method: put
+          cors: true
+  story-get:
+    handler: functions/get-stories-by-id.getStoriesById
+    events:
+      - http:
+          path: stories/{storyIdentifier}
+          method: get
+          cors: true
+  story-put:
+    handler: functions/put-story.putStory
+    events:
+      - http:
+          path: stories/{storyIdentifier}
+          method: PUT
+          cors: true
+  tags-get:
+    handler: functions/get-all-stories.getAllStories
+
+resources:
+  Resources:
+    StoriesDB:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Delete
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: storyIdentifier
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: storyIdentifier
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 20
+          WriteCapacityUnits: 20
+        TableName: ${{self:provider.environment.STORIES_DYNAMODB_TABLE}}
+    TagsDB:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Delete
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: hashKey
+            AttributeType: S
+          -
+            AttributeName: tagIdentifier
+            AttributeType: S
+          -
+            AttributeName: storyPosition
+            AttributeType: N
+        KeySchema:
+          -
+            AttributeName: hashKey
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          -
+            IndexName: ${{self:provider.environment.TAG_IDENTIFIER_DYNAMODB_GSI}}
+            KeySchema:
+              -
+                AttributeName: tagIdentifier
+                KeyType: HASH
+              -
+                AttributeName: storyPosition
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 15
+              WriteCapacityUnits: 15
+        ProvisionedThroughput:
+          ReadCapacityUnits: 15
+          WriteCapacityUnits: 15
+        TableName: ${{self:provider.environment.TAGS_DYNAMODB_TABLE}}
