@@ -52,10 +52,6 @@ provider:
       
 functions:
 
-  replay:
-    handler: functions/replay.replay
-    events:
-      - http: GET replay
   stories-get:
     handler: functions/get-all-stories.getAllTopStories
     events:
@@ -84,8 +80,6 @@ functions:
           path: stories/{storyIdentifier}
           method: PUT
           cors: true
-  tags-get:
-    handler: functions/get-all-stories.getAllStories
 
 resources:
   Resources:

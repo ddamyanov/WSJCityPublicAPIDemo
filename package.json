@@ -1,7 +1,7 @@
 {
   "name": "wsj-city-poc",
   "version": "1.0.0",
-  "description": "enpoint https://v7ux4sjct8.execute-api.us-east-1.amazonaws.com/poc/v6/stories/${identifier}",
+  "description": "serverless API demo",
   "main": "wsj-crawler.js",
   "directories": {
     "test": "test"
@@ -11,14 +11,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/TumbaSolutions/wsj-city-poc.git"
+    "url": "git+https://github.com/TumbaSolutions/WSJCityPublicAPIDemo.git"
   },
-  "author": "",
+  "author": "Tumba Solutions",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/TumbaSolutions/wsj-city-poc/issues"
+    "url": "https://github.com/TumbaSolutions/WSJCityPublicAPIDemo/issues"
   },
-  "homepage": "https://github.com/TumbaSolutions/wsj-city-poc#readme",
+  "homepage": "https://github.com/TumbaSolutions/WSJCityPublicAPIDemo#readme",
   "devDependencies": {
     "request": "^2.81.0",
     "serverless-aws-documentation": "^0.7.0",
