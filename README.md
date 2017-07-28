@@ -21,3 +21,6 @@ There is wsj-crawler.js that will import top stories from WSJ City production in
 
 ### WSJ City iOS beta build
 There is WSJ City iOS beta build which is connected to API deployed at https://6kcvfyb810.execute-api.eu-west-2.amazonaws.com/dev/stories. You can install the build from https://rink.hockeyapp.net/apps/6929cd2ce6f844adbaac96f0ee53f746/app_versions/32
+
+### WSJ City website
+WSJ City website is available at https://d2vz50z2pt1df3.cloudfront.net/ As with the iOS build, website is connected to API deployed at https://6kcvfyb810.execute-api.eu-west-2.amazonaws.com/dev/stories.
