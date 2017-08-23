@@ -1,4 +1,4 @@
-service: test-apig
+service: serverless-stack
 
 frameworkVersion: ">=1.1.0 <2.0.0"
 plugins:
@@ -14,12 +14,13 @@ provider:
   variableSyntax: '\${{(((?!\${{).)+?)}}'
   versionFunctions: false
   memorySize: 512
-  timeout: 20
+  timeout: 10
   region: eu-west-2
+  stage: v1
   environment:
     STORIES_DYNAMODB_TABLE: ${{self:service}}-${{opt:stage, self:provider.stage}}-stories
-    TAGS_DYNAMODB_TABLE: ${{self:service}}-${{opt:stage, self:provider.stage}}-tags
-    TAG_IDENTIFIER_DYNAMODB_GSI: ${{self:service}}-${{opt:stage, self:provider.stage}}-tag-identifier
+    FEEDS_DYNAMODB_TABLE: ${{self:service}}-${{opt:stage, self:provider.stage}}-feeds
+    FEED_IDENTIFIER_DYNAMODB_GSI: ${{self:service}}-${{opt:stage, self:provider.stage}}-feed-identifier
     REGION: ${{self:provider.region}}
 
   iamRoleStatements:
@@ -33,7 +34,7 @@ provider:
         - dynamodb:DeleteItem
         - dynamodb:BatchWriteItem
         - dynamodb:BatchGetItem
-      Resource: ["arn:aws:dynamodb:${{opt:region, self:provider.region}}:*:table/${{self:provider.environment.STORIES_DYNAMODB_TABLE}}", "arn:aws:dynamodb:${{opt:region, self:provider.region}}:*:table/${{self:provider.environment.TAGS_DYNAMODB_TABLE}}", "arn:aws:dynamodb:${{opt:region, self:provider.region}}:*:table/${{self:provider.environment.TAGS_DYNAMODB_TABLE}}/index/*"]
+      Resource: ["arn:aws:dynamodb:${{opt:region, self:provider.region}}:*:table/${{self:provider.environment.STORIES_DYNAMODB_TABLE}}", "arn:aws:dynamodb:${{opt:region, self:provider.region}}:*:table/${{self:provider.environment.FEEDS_DYNAMODB_TABLE}}", "arn:aws:dynamodb:${{opt:region, self:provider.region}}:*:table/${{self:provider.environment.FEEDS_DYNAMODB_TABLE}}/index/*"]
     - Effect: Allow
       Action:
         - xray:PutTraceSegments
@@ -52,37 +53,108 @@ provider:
       
 functions:
 
-  stories-get:
-    handler: functions/get-all-stories.getAllTopStories
+  authorizer:
+    handler: functions/authorizer.allow
+  replay:
+    handler: functions/replay.replay
     events:
       - http:
-          path: stories
+          path: replay
           method: get
           cors: true
-  stories-put:
-    handler: functions/get-all-stories.putAllTopStories
-    events:
-      - http:
-          path: stories
-          method: put
-          cors: true
-  story-get:
-    handler: functions/get-stories-by-id.getStoriesById
-    events:
-      - http:
-          path: stories/{storyIdentifier}
-          method: get
-          cors: true
-  story-put:
-    handler: functions/put-story.putStory
-    events:
-      - http:
-          path: stories/{storyIdentifier}
-          method: PUT
-          cors: true
+          authorizer: authorizer
+  # stories-get:
+  #   handler: functions/stories.get
+  # stories-put:
+  #   handler: functions/stories.put
+  # story-get:
+  #   handler: functions/story.get
+  # story-put:
+  #   handler: functions/story.put
 
 resources:
   Resources:
+    WSJCityAPI:
+      Type: AWS::ApiGateway::RestApi
+      Properties: 
+        Name: WSJ City API
+        Description: API used for WSJ City requests
+        FailOnWarnings: true
+        Body: ${{file(swagger.json)}}
+    WSJCityAPIApiGatewayDeployment:
+      Type: AWS::ApiGateway::Deployment
+      Properties:
+        RestApiId:
+          Ref: WSJCityAPI
+    WSJCityAPIApiGatewayStage:
+      Type: "AWS::ApiGateway::Stage"
+      Properties: 
+        StageName: ${{opt:stage, self:provider.stage}}
+        Description: "Stage description"
+        RestApiId: 
+          Ref: WSJCityAPI
+        DeploymentId: 
+          Ref: WSJCityAPIApiGatewayDeployment
+        CacheClusterEnabled: false
+        CacheClusterSize: 0.5
+        Variables: 
+          V1: "V1"
+        MethodSettings: 
+          - 
+            ResourcePath: "/"
+            HttpMethod: "GET"
+            MetricsEnabled: false
+            DataTraceEnabled: false
+            LoggingLevel: "OFF"
+            CacheTtlInSeconds: 300
+            CachingEnabled: false
+          - 
+            ResourcePath: "/"
+            HttpMethod: "POST"
+            MetricsEnabled: false
+            DataTraceEnabled: false
+            LoggingLevel: "OFF"
+            CacheTtlInSeconds: 300
+            CachingEnabled: false
+          - 
+            ResourcePath: "/"
+            HttpMethod: "PUT"
+            MetricsEnabled: false
+            DataTraceEnabled: false
+            LoggingLevel: "OFF"
+            CacheTtlInSeconds: 300
+            CachingEnabled: false
+
+    ReplayLambdaInvokePermission:
+      Type: AWS::Lambda::Permission
+      Properties: 
+        FunctionName: 
+          Fn::GetAtt: 
+            - ReplayLambdaFunction
+            - Arn
+        Action: "lambda:InvokeFunction"
+        Principal: apigateway.amazonaws.com
+        SourceArn:
+          Fn::Sub:
+            - "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${WSJCityAPI}/*/*"
+            - WSJCityAPI:
+                Ref: WSJCityAPI
+
+    AuthorizerLambdaInvokePermission:
+      Type: AWS::Lambda::Permission
+      Properties: 
+        FunctionName: 
+          Fn::GetAtt: 
+            - ReplayLambdaFunction
+            - Arn
+        Action: "lambda:InvokeFunction"
+        Principal: apigateway.amazonaws.com
+        SourceArn:
+          Fn::Sub:
+            - "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${WSJCityAPI}/*/*"
+            - WSJCityAPI:
+                Ref: WSJCityAPI
+
     StoriesDB:
       Type: 'AWS::DynamoDB::Table'
       DeletionPolicy: Delete
@@ -99,7 +171,7 @@ resources:
           ReadCapacityUnits: 20
           WriteCapacityUnits: 20
         TableName: ${{self:provider.environment.STORIES_DYNAMODB_TABLE}}
-    TagsDB:
+    FeedsDB:
       Type: 'AWS::DynamoDB::Table'
       DeletionPolicy: Delete
       Properties:
@@ -108,7 +180,7 @@ resources:
             AttributeName: hashKey
             AttributeType: S
           -
-            AttributeName: tagIdentifier
+            AttributeName: feedIdentifier
             AttributeType: S
           -
             AttributeName: storyPosition
@@ -119,10 +191,10 @@ resources:
             KeyType: HASH
         GlobalSecondaryIndexes:
           -
-            IndexName: ${{self:provider.environment.TAG_IDENTIFIER_DYNAMODB_GSI}}
+            IndexName: ${{self:provider.environment.FEED_IDENTIFIER_DYNAMODB_GSI}}
             KeySchema:
               -
-                AttributeName: tagIdentifier
+                AttributeName: feedIdentifier
                 KeyType: HASH
               -
                 AttributeName: storyPosition
@@ -135,4 +207,4 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 15
           WriteCapacityUnits: 15
-        TableName: ${{self:provider.environment.TAGS_DYNAMODB_TABLE}}
+        TableName: ${{self:provider.environment.FEEDS_DYNAMODB_TABLE}}

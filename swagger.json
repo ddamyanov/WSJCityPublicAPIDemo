@@ -1,44 +1,101 @@
 {
   "swagger": "2.0",
   "info": {
-    "version": "2017-07-21T14:04:02Z",
-    "title": "dev-WSJ-city"
+    "title": "WSJCity",
+    "version": "version"
   },
-  "host": "6kcvfyb810.execute-api.eu-west-2.amazonaws.com",
-  "basePath": "/dev",
+  "host": "identifier.execute-api.region.amazonaws.com",
+  "basePath": "/stage/version",
   "schemes": [
     "https"
   ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "x-amazon-apigateway-request-validators": {
+    "all": {
+      "validateRequestBody": true,
+      "validateRequestParameters": true
+    },
+    "parameters": {
+      "validateRequestBody": false,
+      "validateRequestParameters": true
+    },
+    "body": {
+      "validateRequestBody": true,
+      "validateRequestParameters": false
+    }
+  },
   "paths": {
     "/stories": {
       "get": {
-        "responses": {},
+        "summary": "API gateway will respect that summary",
+        "description": "API gateway will respect that description",
+        "responses": {
+          "200": {
+            "description": "API gateway will respect that description",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "API gateway will respect that description",
+                "type": "string"
+              }
+            },
+            "schema": {
+              "$ref": "#/definitions/Stories"
+            }
+          }
+        },
+        "x-amazon-apigateway-request-validator": "parameters",
         "x-amazon-apigateway-integration": {
-          "uri": "arn:aws:apigateway:eu-west-2:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-2:606591709415:function:WSJ-city-dev-stories-get/invocations",
+          "uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${{self:service}}-${{opt:stage, self:provider.stage}}-replay/invocations"
+          },
           "passthroughBehavior": "when_no_match",
           "httpMethod": "POST",
           "type": "aws_proxy"
         }
       },
-      "put": {
-        "responses": {},
+      "post": {
+        "summary": "API gateway will respect that summary",
+        "description": "API gateway will respect that description",
+        "parameters": [
+          {
+            "$ref": "#/parameters/storiesInBody"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "API gateway will respect that description",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "API gateway will respect that description",
+                "type": "string"
+              }
+            },
+            "schema": {
+              "$ref": "#/definitions/Stories"
+            }
+          }
+        },
+        "x-amazon-apigateway-request-validator": "body",
         "x-amazon-apigateway-integration": {
-          "uri": "arn:aws:apigateway:eu-west-2:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-2:606591709415:function:WSJ-city-dev-stories-put/invocations",
+          "uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${{self:service}}-${{opt:stage, self:provider.stage}}-replay/invocations"
+          },
           "passthroughBehavior": "when_no_match",
           "httpMethod": "POST",
           "type": "aws_proxy"
         }
       },
       "options": {
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
+        "summary": "API gateway will respect that summary",
+        "description": "API gateway will respect that description",
         "responses": {
           "200": {
-            "description": "200 response",
+            "description": "description is required",
             "headers": {
               "Access-Control-Allow-Origin": {
                 "type": "string"
@@ -60,15 +117,14 @@
             "default": {
               "statusCode": "200",
               "responseParameters": {
-                "method.response.header.Access-Control-Allow-Credentials": "'false'",
-                "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,PUT,GET'",
-                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+                "method.response.header.Access-Control-Allow-Methods": "'DELETE,POST,GET,OPTIONS,PUT'",
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
                 "method.response.header.Access-Control-Allow-Origin": "'*'"
               }
             }
           },
           "requestTemplates": {
-            "application/json": "{statusCode:200}"
+            "application/json": "{\"statusCode\": 200}"
           },
           "passthroughBehavior": "when_no_match",
           "type": "mock"
@@ -77,30 +133,141 @@
     },
     "/stories/{storyIdentifier}": {
       "get": {
-        "responses": {},
+        "summary": "API gateway will respect that summary",
+        "description": "API gateway will respect that description",
+        "parameters": [
+          {
+            "$ref": "#/parameters/storyIdentifierInPath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "API gateway will respect that description",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "API gateway will respect that description",
+                "type": "string"
+              }
+            },
+            "schema": {
+              "$ref": "#/definitions/Story"
+            }
+          }
+        },
+        "x-amazon-apigateway-request-validator": "all",
         "x-amazon-apigateway-integration": {
-          "uri": "arn:aws:apigateway:eu-west-2:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-2:606591709415:function:WSJ-city-dev-story-get/invocations",
+          "requestParameters": {
+            "integration.request.path.storyIdentifier": "method.request.path.storyIdentifier"
+          },
+          "uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${{self:service}}-${{opt:stage, self:provider.stage}}-replay/invocations"
+          },
+          "passthroughBehavior": "when_no_match",
+          "httpMethod": "POST",
+          "type": "aws_proxy"
+        }
+      },
+      "post": {
+        "summary": "API gateway will respect that summary",
+        "description": "API gateway will respect that description. Create or merge single story.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/storyInBody"
+          },
+          {
+            "$ref": "#/parameters/storyIdentifierInPath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "API gateway will respect that description",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "API gateway will respect that description",
+                "type": "string"
+              }
+            },
+            "schema": {
+              "$ref": "#/definitions/Story"
+            }
+          }
+        },
+        "x-amazon-apigateway-request-validator": "all",
+        "x-amazon-apigateway-integration": {
+          "uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${{self:service}}-${{opt:stage, self:provider.stage}}-replay/invocations"
+          },
           "passthroughBehavior": "when_no_match",
           "httpMethod": "POST",
           "type": "aws_proxy"
         }
       },
       "put": {
-        "responses": {},
+        "summary": "API gateway will respect that summary",
+        "description": "API gateway will respect that description. Create or replace single story.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/storyInBody"
+          },
+          {
+            "$ref": "#/parameters/storyIdentifierInPath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "API gateway will respect that description",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "API gateway will respect that description",
+                "type": "string"
+              }
+            },
+            "schema": {
+              "$ref": "#/definitions/Story"
+            }
+          }
+        },
+        "x-amazon-apigateway-request-validator": "all",
         "x-amazon-apigateway-integration": {
-          "uri": "arn:aws:apigateway:eu-west-2:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-2:606591709415:function:WSJ-city-dev-story-put/invocations",
+          "uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${{self:service}}-${{opt:stage, self:provider.stage}}-replay/invocations"
+          },
+          "passthroughBehavior": "when_no_match",
+          "httpMethod": "POST",
+          "type": "aws_proxy"
+        }
+      },
+      "delete": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/storyIdentifierInPath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "API gateway will respect that description",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "API gateway will respect that description",
+                "type": "string"
+              }
+            },
+            "schema": {
+              "$ref": "#/definitions/Story"
+            }
+          }
+        },
+        "x-amazon-apigateway-request-validator": "parameters",
+        "x-amazon-apigateway-integration": {
+          "uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${{self:service}}-${{opt:stage, self:provider.stage}}-replay/invocations"
+          },
           "passthroughBehavior": "when_no_match",
           "httpMethod": "POST",
           "type": "aws_proxy"
         }
       },
       "options": {
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
         "responses": {
           "200": {
             "description": "200 response",
@@ -125,19 +292,235 @@
             "default": {
               "statusCode": "200",
               "responseParameters": {
-                "method.response.header.Access-Control-Allow-Credentials": "'false'",
-                "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,PUT,GET'",
-                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+                "method.response.header.Access-Control-Allow-Methods": "'DELETE,POST,GET,OPTIONS,PUT'",
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
                 "method.response.header.Access-Control-Allow-Origin": "'*'"
               }
             }
           },
           "requestTemplates": {
-            "application/json": "{statusCode:200}"
+            "application/json": "{\"statusCode\": 200}"
           },
           "passthroughBehavior": "when_no_match",
           "type": "mock"
         }
+      }
+    },
+    "/feeds/{feedIdentifier}/stories": {
+      "get": {
+        "summary": "API gateway will respect that summary",
+        "description": "API gateway will respect that description",
+        "parameters": [
+          {
+            "$ref": "#/parameters/feedIdentifierInPath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "API gateway will respect that description",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "API gateway will respect that description",
+                "type": "string"
+              }
+            },
+            "schema": {
+              "$ref": "#/definitions/Stories"
+            }
+          }
+        },
+        "x-amazon-apigateway-request-validator": "parameters",
+        "x-amazon-apigateway-integration": {
+          "uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${{self:service}}-${{opt:stage, self:provider.stage}}-replay/invocations"
+          },
+          "passthroughBehavior": "when_no_match",
+          "httpMethod": "POST",
+          "type": "aws_proxy"
+        }
+      },
+      "put": {
+        "summary": "API gateway will respect that summary",
+        "description": "API gateway will respect that description",
+        "parameters": [
+          {
+            "$ref": "#/parameters/storiesInBody"
+          },
+          {
+            "$ref": "#/parameters/feedIdentifierInPath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "API gateway will respect that description",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "API gateway will respect that description",
+                "type": "string"
+              }
+            },
+            "schema": {
+              "$ref": "#/definitions/Stories"
+            }
+          }
+        },
+        "x-amazon-apigateway-request-validator": "all",
+        "x-amazon-apigateway-integration": {
+          "uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${{self:service}}-${{opt:stage, self:provider.stage}}-replay/invocations"
+          },
+          "passthroughBehavior": "when_no_match",
+          "httpMethod": "POST",
+          "type": "aws_proxy"
+        }
+      },
+      "options": {
+        "summary": "API gateway will respect that summary",
+        "description": "API gateway will respect that description",
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "type": "string"
+              },
+              "Access-Control-Allow-Methods": {
+                "type": "string"
+              },
+              "Access-Control-Allow-Credentials": {
+                "type": "string"
+              },
+              "Access-Control-Allow-Headers": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "responses": {
+            "default": {
+              "statusCode": "200",
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Methods": "'DELETE,POST,GET,OPTIONS,PUT'",
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              }
+            }
+          },
+          "requestTemplates": {
+            "application/json": "{\"statusCode\": 200}"
+          },
+          "passthroughBehavior": "when_no_match",
+          "type": "mock"
+        }
+      }
+    }
+  },
+  "definitions": {
+    "story": {
+      "type": "string"
+    },
+    "Stories": {
+      "type": "object",
+      "properties": {
+        "stories": {
+          "items": {
+            "$ref": "#/definitions/story"
+          },
+          "type": "array"
+        }
+      }
+    },
+    "Story": {
+      "type": "object",
+      "properties": {
+        "story": {
+          "$ref": "#/definitions/story"
+        }
+      }
+    }
+  },
+  "parameters": {
+    "storiesInBody": {
+      "name": "body",
+      "in": "body",
+      "description": "API gateway will respect that description",
+      "required": true,
+      "schema": {
+        "$ref": "#/definitions/Stories"
+      }
+    },
+    "storyIdentifierInPath": {
+      "name": "storyIdentifier",
+      "in": "path",
+      "description": "API gateway will respect that description",
+      "required": true,
+      "type": "string"
+    },
+    "storyInBody": {
+      "name": "body",
+      "in": "body",
+      "description": "API gateway will respect that description",
+      "required": true,
+      "schema": {
+        "$ref": "#/definitions/Story"
+      }
+    },
+    "feedIdentifierInPath": {
+      "name": "feedIdentifier",
+      "in": "path",
+      "description": "API gateway will respect that description",
+      "required": true,
+      "type": "string"
+    }
+  },
+  "responses": {
+    "stories": {
+      "description": "API gateway will respect that description",
+      "headers": {
+        "Access-Control-Allow-Origin": {
+          "description": "API gateway will respect that description",
+          "type": "string"
+        }
+      },
+      "schema": {
+        "$ref": "#/definitions/Stories"
+      }
+    },
+    "story": {
+      "description": "API gateway will respect that description",
+      "headers": {
+        "description": "API gateway will respect that description",
+        "Access-Control-Allow-Origin": {
+          "type": "string"
+        }
+      },
+      "schema": {
+        "$ref": "#/definitions/Story"
+      }
+    },
+    "tags": {
+      "description": "API gateway will respect that description",
+      "headers": {
+        "description": "API gateway will respect that description",
+        "Access-Control-Allow-Origin": {
+          "type": "string"
+        }
+      },
+      "schema": {
+        "$ref": "#/definitions/Tags"
+      }
+    },
+    "tag": {
+      "description": "API gateway will respect that description",
+      "headers": {
+        "Access-Control-Allow-Origin": {
+          "description": "API gateway will respect that description",
+          "type": "string"
+        }
+      },
+      "schema": {
+        "$ref": "#/definitions/Tag"
       }
     }
   }
