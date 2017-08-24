@@ -48,6 +48,11 @@
             }
           }
         },
+        "security": [
+          {
+            "authorizer": []
+          }
+        ],  
         "x-amazon-apigateway-request-validator": "parameters",
         "x-amazon-apigateway-integration": {
           "uri": {
@@ -80,6 +85,11 @@
             }
           }
         },
+        "security": [
+          {
+            "authorizer": []
+          }
+        ],
         "x-amazon-apigateway-request-validator": "body",
         "x-amazon-apigateway-integration": {
           "uri": {
@@ -498,29 +508,20 @@
       "schema": {
         "$ref": "#/definitions/Story"
       }
-    },
-    "tags": {
-      "description": "API gateway will respect that description",
-      "headers": {
-        "description": "API gateway will respect that description",
-        "Access-Control-Allow-Origin": {
-          "type": "string"
-        }
-      },
-      "schema": {
-        "$ref": "#/definitions/Tags"
-      }
-    },
-    "tag": {
-      "description": "API gateway will respect that description",
-      "headers": {
-        "Access-Control-Allow-Origin": {
-          "description": "API gateway will respect that description",
-          "type": "string"
-        }
-      },
-      "schema": {
-        "$ref": "#/definitions/Tag"
+    }
+  },
+  "securityDefinitions": {
+    "authorizer": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header",
+      "x-amazon-apigateway-authtype": "custom",
+      "x-amazon-apigateway-authorizer": {
+        "authorizerResultTtlInSeconds": 300,
+        "authorizerUri": {
+          "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${{self:service}}-${{opt:stage, self:provider.stage}}-authorizer/invocations"
+        },
+        "type": "token"
       }
     }
   }

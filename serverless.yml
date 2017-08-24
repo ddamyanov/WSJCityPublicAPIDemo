@@ -74,6 +74,39 @@ functions:
 
 resources:
   Resources:
+    ApiGatewayCloudWatchLogsRole:
+      Type: AWS::IAM::Role
+      Properties:
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - 
+              Effect: Allow
+              Principal:
+                Service: ["apigateway.amazonaws.com"]
+              Action: ["sts:AssumeRole"]
+        Policies: 
+          -
+            PolicyName: ApiGatewayLogsPolicy
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                -
+                  Effect: Allow
+                  Action:
+                    - logs:CreateLogGroup
+                    - logs:CreateLogStream
+                    - logs:DescribeLogGroups
+                    - logs:DescribeLogStreams
+                    - logs:PutLogEvents
+                    - logs:GetLogEvents
+                    - logs:FilterLogEvents
+                  Resource: ["*"]
+    ApiGatewayAccount:
+      Type: AWS::ApiGateway::Account
+      Properties: 
+        CloudWatchRoleArn:
+          Fn::GetAtt: ["ApiGatewayCloudWatchLogsRole", "Arn"]
     WSJCityAPI:
       Type: AWS::ApiGateway::RestApi
       Properties: 
@@ -101,29 +134,29 @@ resources:
           V1: "V1"
         MethodSettings: 
           - 
-            ResourcePath: "/"
-            HttpMethod: "GET"
-            MetricsEnabled: false
-            DataTraceEnabled: false
-            LoggingLevel: "OFF"
+            ResourcePath: "/*"
+            HttpMethod: "*"
+            MetricsEnabled: true
+            DataTraceEnabled: true
+            LoggingLevel: "INFO"
             CacheTtlInSeconds: 300
             CachingEnabled: false
-          - 
-            ResourcePath: "/"
-            HttpMethod: "POST"
-            MetricsEnabled: false
-            DataTraceEnabled: false
-            LoggingLevel: "OFF"
-            CacheTtlInSeconds: 300
-            CachingEnabled: false
-          - 
-            ResourcePath: "/"
-            HttpMethod: "PUT"
-            MetricsEnabled: false
-            DataTraceEnabled: false
-            LoggingLevel: "OFF"
-            CacheTtlInSeconds: 300
-            CachingEnabled: false
+          # - 
+          #   ResourcePath: "/*"
+          #   HttpMethod: "POST"
+          #   MetricsEnabled: true
+          #   DataTraceEnabled: true
+          #   LoggingLevel: "INFO"
+          #   CacheTtlInSeconds: 300
+          #   CachingEnabled: false
+          # - 
+          #   ResourcePath: "/*"
+          #   HttpMethod: "PUT"
+          #   MetricsEnabled: true
+          #   DataTraceEnabled: true
+          #   LoggingLevel: "INFO"
+          #   CacheTtlInSeconds: 300
+          #   CachingEnabled: false
 
     ReplayLambdaInvokePermission:
       Type: AWS::Lambda::Permission
