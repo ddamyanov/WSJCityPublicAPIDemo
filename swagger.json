@@ -47,12 +47,7 @@
               "$ref": "#/definitions/Stories"
             }
           }
-        },
-        "security": [
-          {
-            "authorizer": []
-          }
-        ],  
+        },  
         "x-amazon-apigateway-request-validator": "parameters",
         "x-amazon-apigateway-integration": {
           "uri": {
@@ -202,6 +197,11 @@
             }
           }
         },
+        "security": [
+          {
+            "authorizer": []
+          }
+        ],
         "x-amazon-apigateway-request-validator": "all",
         "x-amazon-apigateway-integration": {
           "uri": {
@@ -237,6 +237,11 @@
             }
           }
         },
+        "security": [
+          {
+            "authorizer": []
+          }
+        ],
         "x-amazon-apigateway-request-validator": "all",
         "x-amazon-apigateway-integration": {
           "uri": {
@@ -267,6 +272,11 @@
             }
           }
         },
+        "security": [
+          {
+            "authorizer": []
+          }
+        ],
         "x-amazon-apigateway-request-validator": "parameters",
         "x-amazon-apigateway-integration": {
           "uri": {
@@ -374,6 +384,11 @@
             }
           }
         },
+        "security": [
+          {
+            "authorizer": []
+          }
+        ],
         "x-amazon-apigateway-request-validator": "all",
         "x-amazon-apigateway-integration": {
           "uri": {
