@@ -50,11 +50,18 @@ provider:
         - logs:GetLogEvents
         - logs:FilterLogEvents
       Resource: ["*"]
-      
+    - Effect: Allow
+      Action: 
+        - execute-api:InvalidateCache
+      Resource:
+        - Fn::Sub: "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:*/*/*"
+
 functions:
 
   authorizer:
     handler: functions/authorizer.allow
+  invalidate:
+    handler: functions/invalidate.invalidate
   replay:
     handler: functions/replay.replay
     events:
@@ -65,10 +72,12 @@ functions:
           authorizer: authorizer
   # stories-get:
   #   handler: functions/stories.get
-  # stories-put:
-  #   handler: functions/stories.put
+  # stories-post:
+  #   handler: functions/stories.post
   # story-get:
   #   handler: functions/story.get
+  # story-post:
+  #   handler: functions/story.post
   # story-put:
   #   handler: functions/story.put
 
@@ -131,40 +140,52 @@ resources:
         CacheClusterEnabled: false
         CacheClusterSize: 0.5
         Variables: 
-          V1: "V1"
-        MethodSettings: 
+          domain:
+            Fn::Sub:
+              - "https://${WSJCityAPI}.execute-api.eu-west-2.amazonaws.com"
+              - WSJCityAPI:
+                  Ref: WSJCityAPI
+          stage: ${{opt:stage, self:provider.stage}}
+
+        MethodSettings:
           - 
-            ResourcePath: "/*"
-            HttpMethod: "*"
+            ResourcePath: "/stories/*"
+            HttpMethod: "GET"
             MetricsEnabled: true
             DataTraceEnabled: true
             LoggingLevel: "INFO"
             CacheTtlInSeconds: 300
             CachingEnabled: false
-          # - 
-          #   ResourcePath: "/*"
-          #   HttpMethod: "POST"
-          #   MetricsEnabled: true
-          #   DataTraceEnabled: true
-          #   LoggingLevel: "INFO"
-          #   CacheTtlInSeconds: 300
-          #   CachingEnabled: false
-          # - 
-          #   ResourcePath: "/*"
-          #   HttpMethod: "PUT"
-          #   MetricsEnabled: true
-          #   DataTraceEnabled: true
-          #   LoggingLevel: "INFO"
-          #   CacheTtlInSeconds: 300
-          #   CachingEnabled: false
+          - 
+            ResourcePath: "/feeds/*"
+            HttpMethod: "GET"
+            MetricsEnabled: true
+            DataTraceEnabled: true
+            LoggingLevel: "INFO"
+            CacheTtlInSeconds: 300
+            CachingEnabled: false
+          - 
+            ResourcePath: "/*"
+            HttpMethod: "POST"
+            MetricsEnabled: true
+            DataTraceEnabled: true
+            LoggingLevel: "INFO"
+            CacheTtlInSeconds: 300
+            CachingEnabled: false
+          - 
+            ResourcePath: "/*"
+            HttpMethod: "PUT"
+            MetricsEnabled: true
+            DataTraceEnabled: true
+            LoggingLevel: "INFO"
+            CacheTtlInSeconds: 300
+            CachingEnabled: false
 
     ReplayLambdaInvokePermission:
       Type: AWS::Lambda::Permission
       Properties: 
         FunctionName: 
-          Fn::GetAtt: 
-            - ReplayLambdaFunction
-            - Arn
+          Fn::Sub: "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${{self:service}}-${{opt:stage, self:provider.stage}}-replay"
         Action: "lambda:InvokeFunction"
         Principal: apigateway.amazonaws.com
         SourceArn:
@@ -177,9 +198,20 @@ resources:
       Type: AWS::Lambda::Permission
       Properties: 
         FunctionName: 
-          Fn::GetAtt: 
-            - ReplayLambdaFunction
-            - Arn
+          Fn::Sub: "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${{self:service}}-${{opt:stage, self:provider.stage}}-authorizer"
+        Action: "lambda:InvokeFunction"
+        Principal: apigateway.amazonaws.com
+        SourceArn:
+          Fn::Sub:
+            - "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${WSJCityAPI}/*/*"
+            - WSJCityAPI:
+                Ref: WSJCityAPI
+
+    InvalidateLambdaInvokePermission:
+      Type: AWS::Lambda::Permission
+      Properties: 
+        FunctionName:
+          Fn::Sub: "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${{self:service}}-${{opt:stage, self:provider.stage}}-invalidate"
         Action: "lambda:InvokeFunction"
         Principal: apigateway.amazonaws.com
         SourceArn:

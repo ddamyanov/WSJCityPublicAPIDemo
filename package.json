@@ -28,6 +28,7 @@
     "aws-xray-sdk": "^1.1.2",
     "aws-xray-sdk-core": "^1.1.2",
     "jsonwebtoken": "^7.4.2",
-    "jwks-rsa": "^1.2.0"
+    "jwks-rsa": "^1.2.0",
+    "request": "^2.81.0"
   }
 }
