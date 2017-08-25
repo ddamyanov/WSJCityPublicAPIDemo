@@ -123,6 +123,7 @@ resources:
         Description: API used for WSJ City requests
         FailOnWarnings: true
         Body: ${{file(swagger.json)}}
+      DependsOn: [ReplayLambdaFunction, AuthorizerLambdaFunction, InvalidateLambdaFunction]
     WSJCityAPIApiGatewayDeployment:
       Type: AWS::ApiGateway::Deployment
       Properties:
@@ -149,21 +150,21 @@ resources:
 
         MethodSettings:
           - 
-            ResourcePath: "/stories/*"
+            ResourcePath: "/*"
             HttpMethod: "GET"
             MetricsEnabled: true
             DataTraceEnabled: true
             LoggingLevel: "INFO"
             CacheTtlInSeconds: 300
             CachingEnabled: false
-          - 
-            ResourcePath: "/feeds/*"
-            HttpMethod: "GET"
-            MetricsEnabled: true
-            DataTraceEnabled: true
-            LoggingLevel: "INFO"
-            CacheTtlInSeconds: 300
-            CachingEnabled: false
+          # - 
+          #   ResourcePath: "/feeds/*"
+          #   HttpMethod: "GET"
+          #   MetricsEnabled: true
+          #   DataTraceEnabled: true
+          #   LoggingLevel: "INFO"
+          #   CacheTtlInSeconds: 300
+          #   CachingEnabled: true
           - 
             ResourcePath: "/*"
             HttpMethod: "POST"
@@ -193,6 +194,7 @@ resources:
             - "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${WSJCityAPI}/*/*"
             - WSJCityAPI:
                 Ref: WSJCityAPI
+      DependsOn: [ReplayLambdaFunction]
 
     AuthorizerLambdaInvokePermission:
       Type: AWS::Lambda::Permission
@@ -206,6 +208,7 @@ resources:
             - "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${WSJCityAPI}/*/*"
             - WSJCityAPI:
                 Ref: WSJCityAPI
+      DependsOn: [AuthorizerLambdaFunction]
 
     InvalidateLambdaInvokePermission:
       Type: AWS::Lambda::Permission
@@ -219,6 +222,7 @@ resources:
             - "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${WSJCityAPI}/*/*"
             - WSJCityAPI:
                 Ref: WSJCityAPI
+      DependsOn: [InvalidateLambdaFunction]
 
     StoriesDB:
       Type: 'AWS::DynamoDB::Table'
