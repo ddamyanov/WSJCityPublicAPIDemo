@@ -138,7 +138,7 @@ resources:
           Ref: WSJCityAPI
         DeploymentId: 
           Ref: WSJCityAPIApiGatewayDeployment
-        CacheClusterEnabled: false
+        CacheClusterEnabled: true
         CacheClusterSize: 0.5
         Variables: 
           domain:
@@ -150,32 +150,24 @@ resources:
 
         MethodSettings:
           - 
-            ResourcePath: "/*"
+            ResourcePath: "/stories"
             HttpMethod: "GET"
             MetricsEnabled: true
             DataTraceEnabled: true
             LoggingLevel: "INFO"
             CacheTtlInSeconds: 300
-            CachingEnabled: false
-          # - 
-          #   ResourcePath: "/feeds/*"
-          #   HttpMethod: "GET"
-          #   MetricsEnabled: true
-          #   DataTraceEnabled: true
-          #   LoggingLevel: "INFO"
-          #   CacheTtlInSeconds: 300
-          #   CachingEnabled: true
+            CachingEnabled: true
           - 
-            ResourcePath: "/*"
-            HttpMethod: "POST"
+            ResourcePath: "/feeds/{feedIdentifier}/stories"
+            HttpMethod: "GET"
             MetricsEnabled: true
             DataTraceEnabled: true
             LoggingLevel: "INFO"
             CacheTtlInSeconds: 300
-            CachingEnabled: false
+            CachingEnabled: true
           - 
             ResourcePath: "/*"
-            HttpMethod: "PUT"
+            HttpMethod: "*"
             MetricsEnabled: true
             DataTraceEnabled: true
             LoggingLevel: "INFO"

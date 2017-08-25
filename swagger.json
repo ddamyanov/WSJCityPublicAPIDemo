@@ -50,6 +50,7 @@
         },  
         "x-amazon-apigateway-request-validator": "parameters",
         "x-amazon-apigateway-integration": {
+          "cacheNamespace": "kzuted4215",
           "cacheKeyParameters": [],
           "uri": {
             "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${{self:service}}-${{opt:stage, self:provider.stage}}-replay/invocations"
