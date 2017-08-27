@@ -44,7 +44,7 @@
               }
             },
             "schema": {
-              "$ref": "#/definitions/Stories"
+              "$ref": "#/definitions/StoriesInBody"
             }
           }
         },  
@@ -53,44 +53,7 @@
           "cacheNamespace": "kzuted4215",
           "cacheKeyParameters": [],
           "uri": {
-            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${{self:service}}-${{opt:stage, self:provider.stage}}-replay/invocations"
-          },
-          "passthroughBehavior": "when_no_match",
-          "httpMethod": "POST",
-          "type": "aws_proxy"
-        }
-      },
-      "post": {
-        "summary": "API gateway will respect that summary",
-        "description": "API gateway will respect that description",
-        "parameters": [
-          {
-            "$ref": "#/parameters/storiesInBody"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "API gateway will respect that description",
-            "headers": {
-              "Access-Control-Allow-Origin": {
-                "description": "API gateway will respect that description",
-                "type": "string"
-              }
-            },
-            "schema": {
-              "$ref": "#/definitions/Stories"
-            }
-          }
-        },
-        "security": [
-          {
-            "authorizer": []
-          }
-        ],
-        "x-amazon-apigateway-request-validator": "body",
-        "x-amazon-apigateway-integration": {
-          "uri": {
-            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${{self:service}}-${{opt:stage, self:provider.stage}}-replay/invocations"
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${{self:service}}-${{opt:stage, self:provider.stage}}-stories/invocations"
           },
           "passthroughBehavior": "when_no_match",
           "httpMethod": "POST",
@@ -157,57 +120,17 @@
               }
             },
             "schema": {
-              "$ref": "#/definitions/Story"
+              "$ref": "#/definitions/StoryInBody"
             }
           }
         },
-        "x-amazon-apigateway-request-validator": "all",
+        "x-amazon-apigateway-request-validator": "parameters",
         "x-amazon-apigateway-integration": {
           "requestParameters": {
             "integration.request.path.storyIdentifier": "method.request.path.storyIdentifier"
           },
           "uri": {
-            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${{self:service}}-${{opt:stage, self:provider.stage}}-replay/invocations"
-          },
-          "passthroughBehavior": "when_no_match",
-          "httpMethod": "POST",
-          "type": "aws_proxy"
-        }
-      },
-      "post": {
-        "summary": "API gateway will respect that summary",
-        "description": "API gateway will respect that description. Create or merge single story.",
-        "parameters": [
-          {
-            "$ref": "#/parameters/storyInBody"
-          },
-          {
-            "$ref": "#/parameters/storyIdentifierInPath"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "API gateway will respect that description",
-            "headers": {
-              "Access-Control-Allow-Origin": {
-                "description": "API gateway will respect that description",
-                "type": "string"
-              }
-            },
-            "schema": {
-              "$ref": "#/definitions/Story"
-            }
-          }
-        },
-        "security": [
-          {
-            "authorizer": []
-          }
-        ],
-        "x-amazon-apigateway-request-validator": "all",
-        "x-amazon-apigateway-integration": {
-          "uri": {
-            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${{self:service}}-${{opt:stage, self:provider.stage}}-replay/invocations"
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${{self:service}}-${{opt:stage, self:provider.stage}}-story/invocations"
           },
           "passthroughBehavior": "when_no_match",
           "httpMethod": "POST",
@@ -235,54 +158,14 @@
               }
             },
             "schema": {
-              "$ref": "#/definitions/Story"
+              "$ref": "#/definitions/StoryInBody"
             }
           }
         },
-        "security": [
-          {
-            "authorizer": []
-          }
-        ],
         "x-amazon-apigateway-request-validator": "all",
         "x-amazon-apigateway-integration": {
           "uri": {
-            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${{self:service}}-${{opt:stage, self:provider.stage}}-replay/invocations"
-          },
-          "passthroughBehavior": "when_no_match",
-          "httpMethod": "POST",
-          "type": "aws_proxy"
-        }
-      },
-      "delete": {
-        "parameters": [
-          {
-            "$ref": "#/parameters/storyIdentifierInPath"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "API gateway will respect that description",
-            "headers": {
-              "Access-Control-Allow-Origin": {
-                "description": "API gateway will respect that description",
-                "type": "string"
-              }
-            },
-            "schema": {
-              "$ref": "#/definitions/Story"
-            }
-          }
-        },
-        "security": [
-          {
-            "authorizer": []
-          }
-        ],
-        "x-amazon-apigateway-request-validator": "parameters",
-        "x-amazon-apigateway-integration": {
-          "uri": {
-            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${{self:service}}-${{opt:stage, self:provider.stage}}-replay/invocations"
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${{self:service}}-${{opt:stage, self:provider.stage}}-story/invocations"
           },
           "passthroughBehavior": "when_no_match",
           "httpMethod": "POST",
@@ -347,14 +230,14 @@
               }
             },
             "schema": {
-              "$ref": "#/definitions/Stories"
+              "$ref": "#/definitions/StoriesInBody"
             }
           }
         },
         "x-amazon-apigateway-request-validator": "parameters",
         "x-amazon-apigateway-integration": {
           "uri": {
-            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${{self:service}}-${{opt:stage, self:provider.stage}}-replay/invocations"
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${{self:service}}-${{opt:stage, self:provider.stage}}-feedStories/invocations"
           },
           "passthroughBehavior": "when_no_match",
           "httpMethod": "POST",
@@ -366,7 +249,7 @@
         "description": "API gateway will respect that description",
         "parameters": [
           {
-            "$ref": "#/parameters/storiesInBody"
+            "$ref": "#/parameters/storyIdentifiersInBody"
           },
           {
             "$ref": "#/parameters/feedIdentifierInPath"
@@ -382,7 +265,7 @@
               }
             },
             "schema": {
-              "$ref": "#/definitions/Stories"
+              "$ref": "#/definitions/StoriesInBody"
             }
           }
         },
@@ -394,7 +277,7 @@
         "x-amazon-apigateway-request-validator": "all",
         "x-amazon-apigateway-integration": {
           "uri": {
-            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${{self:service}}-${{opt:stage, self:provider.stage}}-replay/invocations"
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${{self:service}}-${{opt:stage, self:provider.stage}}-feedStories/invocations"
           },
           "passthroughBehavior": "when_no_match",
           "httpMethod": "POST",
@@ -510,25 +393,48 @@
     }
   },
   "definitions": {
-    "story": {
-      "type": "string"
+    "UUID": {
+      "type": "string",
+      "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
     },
-    "Stories": {
+    "Story": {
+      "type": "object",
+      "properties": {
+        "storyId": {
+          "$ref": "#/definitions/UUID"
+        },
+        "revisionId": {
+          "$ref": "#/definitions/UUID"
+        }
+      }
+    },
+    "StoriesInBody": {
       "type": "object",
       "properties": {
         "stories": {
           "items": {
-            "$ref": "#/definitions/story"
+            "$ref": "#/definitions/Story"
           },
           "type": "array"
         }
       }
     },
-    "Story": {
+    "StoryIdentifiersInBody": {
+      "type": "object",
+      "properties": {
+        "stories": {
+          "items": {
+            "$ref": "#/definitions/UUID"
+          },
+          "type": "array"
+        }
+      }
+    },
+    "StoryInBody": {
       "type": "object",
       "properties": {
         "story": {
-          "$ref": "#/definitions/story"
+          "$ref": "#/definitions/Story"
         }
       }
     }
@@ -540,7 +446,16 @@
       "description": "API gateway will respect that description",
       "required": true,
       "schema": {
-        "$ref": "#/definitions/Stories"
+        "$ref": "#/definitions/StoriesInBody"
+      }
+    },
+    "storyIdentifiersInBody": {
+      "name": "body",
+      "in": "body",
+      "description": "API gateway will respect that description",
+      "required": true,
+      "schema": {
+        "$ref": "#/definitions/StoryIdentifiersInBody"
       }
     },
     "storyIdentifierInPath": {
@@ -548,7 +463,9 @@
       "in": "path",
       "description": "API gateway will respect that description",
       "required": true,
-      "type": "string"
+      "schema": {
+        "$ref": "#/definitions/UUID"
+      }
     },
     "storyInBody": {
       "name": "body",
@@ -556,7 +473,7 @@
       "description": "API gateway will respect that description",
       "required": true,
       "schema": {
-        "$ref": "#/definitions/Story"
+        "$ref": "#/definitions/StoryInBody"
       }
     },
     "feedIdentifierInPath": {
@@ -564,7 +481,9 @@
       "in": "path",
       "description": "API gateway will respect that description",
       "required": true,
-      "type": "string"
+      "schema": {
+        "$ref": "#/definitions/UUID"
+      }
     }
   },
   "responses": {

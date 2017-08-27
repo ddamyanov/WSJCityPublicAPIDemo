@@ -70,16 +70,12 @@ functions:
           method: get
           cors: true
           authorizer: authorizer
-  # stories-get:
-  #   handler: functions/stories.get
-  # stories-post:
-  #   handler: functions/stories.post
-  # story-get:
-  #   handler: functions/story.get
-  # story-post:
-  #   handler: functions/story.post
-  # story-put:
-  #   handler: functions/story.put
+  stories:
+    handler: functions/stories.handler
+  story:
+    handler: functions/story.handler
+  feedStories:
+    handler: functions/feedStories.handler
 
 resources:
   Resources:
@@ -138,7 +134,7 @@ resources:
           Ref: WSJCityAPI
         DeploymentId: 
           Ref: WSJCityAPIApiGatewayDeployment
-        CacheClusterEnabled: true
+        CacheClusterEnabled: false
         CacheClusterSize: 0.5
         Variables: 
           domain:
@@ -156,7 +152,15 @@ resources:
             DataTraceEnabled: true
             LoggingLevel: "INFO"
             CacheTtlInSeconds: 300
-            CachingEnabled: true
+            CachingEnabled: false
+          - 
+            ResourcePath: "/stories/{storyIdentifier}"
+            HttpMethod: "GET"
+            MetricsEnabled: true
+            DataTraceEnabled: true
+            LoggingLevel: "INFO"
+            CacheTtlInSeconds: 300
+            CachingEnabled: false
           - 
             ResourcePath: "/feeds/{feedIdentifier}/stories"
             HttpMethod: "GET"
@@ -164,14 +168,13 @@ resources:
             DataTraceEnabled: true
             LoggingLevel: "INFO"
             CacheTtlInSeconds: 300
-            CachingEnabled: true
+            CachingEnabled: false
           - 
             ResourcePath: "/*"
             HttpMethod: "*"
             MetricsEnabled: true
             DataTraceEnabled: true
             LoggingLevel: "INFO"
-            CacheTtlInSeconds: 300
             CachingEnabled: false
 
     ReplayLambdaInvokePermission:
@@ -215,6 +218,48 @@ resources:
             - WSJCityAPI:
                 Ref: WSJCityAPI
       DependsOn: [InvalidateLambdaFunction]
+
+    StoriesLambdaInvokePermission:
+      Type: AWS::Lambda::Permission
+      Properties: 
+        FunctionName:
+          Fn::Sub: "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${{self:service}}-${{opt:stage, self:provider.stage}}-stories"
+        Action: "lambda:InvokeFunction"
+        Principal: apigateway.amazonaws.com
+        SourceArn:
+          Fn::Sub:
+            - "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${WSJCityAPI}/*/*"
+            - WSJCityAPI:
+                Ref: WSJCityAPI
+      DependsOn: [StoriesLambdaFunction]
+
+    StoryLambdaInvokePermission:
+      Type: AWS::Lambda::Permission
+      Properties: 
+        FunctionName:
+          Fn::Sub: "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${{self:service}}-${{opt:stage, self:provider.stage}}-story"
+        Action: "lambda:InvokeFunction"
+        Principal: apigateway.amazonaws.com
+        SourceArn:
+          Fn::Sub:
+            - "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${WSJCityAPI}/*/*"
+            - WSJCityAPI:
+                Ref: WSJCityAPI
+      DependsOn: [StoryLambdaFunction]
+
+    FeedStoriesLambdaInvokePermission:
+      Type: AWS::Lambda::Permission
+      Properties: 
+        FunctionName:
+          Fn::Sub: "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${{self:service}}-${{opt:stage, self:provider.stage}}-feedStories"
+        Action: "lambda:InvokeFunction"
+        Principal: apigateway.amazonaws.com
+        SourceArn:
+          Fn::Sub:
+            - "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${WSJCityAPI}/*/*"
+            - WSJCityAPI:
+                Ref: WSJCityAPI
+      DependsOn: [FeedStoriesLambdaFunction]
 
     StoriesDB:
       Type: 'AWS::DynamoDB::Table'
