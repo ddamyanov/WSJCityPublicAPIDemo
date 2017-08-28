@@ -47,7 +47,7 @@
               "$ref": "#/definitions/StoriesInBody"
             }
           }
-        },  
+        },
         "x-amazon-apigateway-request-validator": "parameters",
         "x-amazon-apigateway-integration": {
           "cacheNamespace": "kzuted4215",
@@ -162,6 +162,11 @@
             }
           }
         },
+        "security": [
+          {
+            "authorizer": []
+          }
+        ],
         "x-amazon-apigateway-request-validator": "all",
         "x-amazon-apigateway-integration": {
           "uri": {
@@ -405,6 +410,18 @@
         },
         "revisionId": {
           "$ref": "#/definitions/UUID"
+        },
+        "creationDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "modificationDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "publicationDate": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },
@@ -417,7 +434,11 @@
           },
           "type": "array"
         }
-      }
+      },
+      "additionalProperties": false,
+      "required": [
+        "stories"
+      ]
     },
     "StoryIdentifiersInBody": {
       "type": "object",
@@ -428,7 +449,11 @@
           },
           "type": "array"
         }
-      }
+      },
+      "additionalProperties": false,
+      "required": [
+        "stories"
+      ]
     },
     "StoryInBody": {
       "type": "object",
@@ -436,7 +461,11 @@
         "story": {
           "$ref": "#/definitions/Story"
         }
-      }
+      },
+      "additionalProperties": false,
+      "required": [
+        "story"
+      ]
     }
   },
   "parameters": {
