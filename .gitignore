@@ -61,4 +61,4 @@ typings/
 .serverless
 
 # Serverless built directory
-.built
+built
