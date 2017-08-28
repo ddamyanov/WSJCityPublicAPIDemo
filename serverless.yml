@@ -24,6 +24,7 @@ provider:
     FEEDS_DYNAMODB_TABLE: ${{self:service}}-${{opt:stage, self:provider.stage}}-feeds
     FEED_IDENTIFIER_DYNAMODB_GSI: ${{self:service}}-${{opt:stage, self:provider.stage}}-feed-identifier
     REGION: ${{self:provider.region}}
+    LOCAL_DIRECTORY: functions
 
   iamRoleStatements:
     - Effect: Allow
@@ -61,11 +62,11 @@ provider:
 functions:
 
   authorizer:
-    handler: functions/authorizer.allow
+    handler: ${{opt:directory, self:provider.environment.LOCAL_DIRECTORY}}/authorizer.allow
   invalidate:
-    handler: functions/invalidate.invalidate
+    handler: ${{opt:directory, self:provider.environment.LOCAL_DIRECTORY}}/invalidate.invalidate
   replay:
-    handler: functions/replay.replay
+    handler: ${{opt:directory, self:provider.environment.LOCAL_DIRECTORY}}/replay.replay
     events:
       - http:
           path: replay
@@ -73,11 +74,11 @@ functions:
           cors: true
           authorizer: authorizer
   stories:
-    handler: functions/stories.handler
+    handler: ${{opt:directory, self:provider.environment.LOCAL_DIRECTORY}}/stories.handler
   story:
-    handler: functions/story.handler
+    handler: ${{opt:directory, self:provider.environment.LOCAL_DIRECTORY}}/story.handler
   feedStories:
-    handler: functions/feedStories.handler
+    handler: ${{opt:directory, self:provider.environment.LOCAL_DIRECTORY}}/feedStories.handler
 
 resources:
   Resources:
