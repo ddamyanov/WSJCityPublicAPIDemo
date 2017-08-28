@@ -62,3 +62,6 @@ typings/
 
 # Serverless built directory
 built
+
+# Serverless dist directory
+dist

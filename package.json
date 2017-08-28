@@ -9,7 +9,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "tsc && serverless offline start",
-    "tsc-watch": "tsc --watch"
+    "tsc-watch": "tsc --watch",
+    "dist": "tsc --sourceMap false --outDir dist"
   },
   "repository": {
     "type": "git",
