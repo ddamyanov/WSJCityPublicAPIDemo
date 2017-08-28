@@ -3,6 +3,8 @@ service: serverless-stack
 frameworkVersion: ">=1.1.0 <2.0.0"
 plugins:
   - serverless-mocha-plugin
+  #- serverless-dynamodb-local #It is important that dynamo comes before serverless https://github.com/99xt/serverless-dynamodb-local
+  - serverless-offline
   # - serverless-aws-documentation
 
 provider:

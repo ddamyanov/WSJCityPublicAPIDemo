@@ -21,7 +21,7 @@ exports.authorize = (event, context, callback) => {
       if (error) {
         console.log("error:", error);
         callback("Can not get signing key");
-        returnl
+        return;
       }
       const signingKey = key.publicKey || key.rsaPublicKey;
       JWT.verify(token, signingKey, function (error, decoded) {
